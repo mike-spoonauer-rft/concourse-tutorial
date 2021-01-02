@@ -2,7 +2,7 @@ resources:
 - name: sample_resource
   type: git
   source:
-    uri: https://git.sami.int.thomsonreuters.com/Mike.Spoonauer/concourse-tutorial.git
+    uri: https://github.com/mike-spoonauer-rft/concourse-tutorial
     branch: master
 
 jobs:
