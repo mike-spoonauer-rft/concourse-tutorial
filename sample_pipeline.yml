@@ -1,5 +1,5 @@
 resources:
-- name: sample_resource
+- name: sample-resource
   type: git
   source:
     uri: https://github.com/mike-spoonauer-rft/concourse-tutorial
@@ -9,6 +9,6 @@ jobs:
 - name: hello-world
   public: true
   plan:
-  - get: sample_resource
+  - get: sample-resource
   - task: hello-world
-    file: sample_resource/tasks/hello_world.yml
+    file: sample-resource/tasks/hello_world.yml
