@@ -1,0 +1,37 @@
+resources:
+  - name: keycloak-git # name of concourse resource
+    type: git # resource type, see: https://concourse-ci.org/resource-types.html
+    icon: git # see: https://concourse-ci.org/resources.html#schema.resource.icon
+    source:
+      uri: https://github.com/keycloak/keycloak.git # clone via https
+      #uri: git@github.com:keycloak/keycloak.git # clone via ssh
+      branch: master
+      #username: ((kv/some/secret/github-access-token)) # if github repo is behind auth, you can supply token like this, fetched from vault secret
+      #password: x-oauth-basic # this is just a marker to tell github that we supplied token via username. You can also just supply username/password here for http auth normally
+      #private_key: ((kv/some/secret/github-private-key)) # if you clone via ssh, this is how you can supply private key fetched from vault
+
+jobs: # list of jobs in the pipeline, we have only one now. see: https://concourse-ci.org/jobs.html
+  - name: compile # name of a job
+    plan: # sequence of steps to execute in this job, see: https://concourse-ci.org/jobs.html#steps
+      - get: keycloak-git # get step on keycloak-git resource
+        trigger: true # this means that when keycloak-git produces a new version (new commit), the job will be triggered
+      - task: compile-java
+        # you can abstract task config to file, but we will embed task definition in pipeline for now
+        #file: some-git-resource/path/to/task/file.yml
+        config:
+          platform: linux # windows coming soon
+          image_resource:
+            type: registry-image
+            source:
+              repository: maven
+              tag: 3.6.3-openjdk-8-slim # see: https://hub.docker.com/_/maven?tab=description
+          run:
+            path: sh
+            args:
+              - "-c"
+              - |
+                set -eu pipefail
+                apk -q add git
+                java -version
+                mvn -version
+                git --version
